@@ -4,7 +4,9 @@ version = "0.1.0"
 description = "A Python library for building text-based applications that makes printing beautiful output and handling user input simple. Perfect for text RPGs, interactive stories, and terminal tools."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "windows-curses>=2.4.1; sys_platform == 'win32'",
+]
 
 [dependency-groups]
 dev = [
