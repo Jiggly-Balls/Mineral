@@ -11,3 +11,46 @@ dev = [
     "basedpyright>=1.31.3",
     "ruff>=0.12.11",
 ]
+
+[tool.ruff]
+line-length = 79
+lint.extend-select = ["ANN", "I"]
+lint.ignore = ["ANN401", "F"]
+lint.fixable = ["I", "F401"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 72
+
+[tool.basedpyright]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "test*.py",
+    "venv/",
+    "build/",
+    "dist/",
+    "local/",
+    "examples/",
+    "docs/",
+    "lib_testing/",
+    "tests/",
+]
+reportImportCycles = false
+reportUnnecessaryIsInstance = false
+reportImplicitStringConcatenation = false
+reportUnusedCallResult = false
+reportMissingTypeStubs = false
+reportAssignmentType = false
+reportRedeclaration = false
+reportAny = false
+reportExplicitAny = false
+reportUnknownVariableType = false
+reportDeprecated = false
+reportImplicitOverride = false
+reportUnusedParameter = false
+reportIncompatibleVariableOverride = false
+reportPossiblyUnboundVariable = false
