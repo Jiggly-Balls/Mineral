@@ -5,3 +5,9 @@ description = "A Python library for building text-based applications that makes 
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = []
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.31.3",
+    "ruff>=0.12.11",
+]
