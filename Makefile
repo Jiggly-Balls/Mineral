@@ -1,9 +1,9 @@
 all: ruff
 
 ruff:
-	uv run ruff format
-	uv run ruff check --fix
+	uv tool run ruff format
+	uv tool run ruff check --fix
 
 check:
-	uv run basedpyright .
+	uv tool run basedpyright .
 	
