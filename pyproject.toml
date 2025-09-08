@@ -9,10 +9,7 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = [
-    "basedpyright>=1.31.3",
-    "ruff>=0.12.11",
-]
+dev = []
 
 [tool.ruff]
 line-length = 79
