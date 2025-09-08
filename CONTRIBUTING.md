@@ -79,4 +79,4 @@ For questions, open a [discussion](https://github.com/Jiggly-Balls/Mineral/discu
 
 ## 📄 License
 
-By contributing to this project, you agree that your contributions will be licensed under the same MIT license as the repository.
+By contributing to this project, you agree that your contributions will be licensed under the same [license](https://github.com/Jiggly-Balls/Mineral/blob/main/LICENSE) as the repository.
