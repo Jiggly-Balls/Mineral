@@ -5,9 +5,12 @@ import time
 from typing import TYPE_CHECKING, overload
 
 if TYPE_CHECKING:
+    from curses import window
     from typing import Any, Literal, Optional, Sequence, Union
 
 from .types import Colour, ReturnType
+
+__all__ = ("Console",)
 
 
 class Console:
@@ -19,20 +22,20 @@ class Console:
 
     def __init__(
         self,
-        def_option_colour: Colour,
-        def_option_bg: Colour,
-        def_text_colour: Colour,
-        def_text_bg: Colour,
-        def_text_end: str = "",
+        option_colour: Colour = Colour.WHITE,
+        option_bg: Colour = Colour.BLACK,
+        text_colour: Colour = Colour.WHITE,
+        text_bg: Colour = Colour.BLACK,
+        text_end: str = "",
         line_wrap: int = 80,
         text_delay: float = 0.02,
         max_input_char: int = 30,
     ) -> None:
-        self.option_colour = def_option_colour
-        self.option_bg = def_option_bg
-        self.text_end = def_text_end
-        self.text_colour = def_text_colour
-        self.text_bg = def_text_bg
+        self.option_colour = option_colour
+        self.option_bg = option_bg
+        self.text_end = text_end
+        self.text_colour = text_colour
+        self.text_bg = text_bg
         self.line_wrap = line_wrap
         self.text_delay = text_delay
         self.max_input_char = max_input_char
@@ -40,31 +43,19 @@ class Console:
         curses.initscr()
         curses.start_color()
 
-    def _max_wrap(self, win: Any) -> int:
+    def _max_wrap(self, win: window) -> int:
         _, max_cols = win.getmaxyx()
         if self.line_wrap < 0:
             return max_cols
         return min(max_cols, self.line_wrap)
 
-    def text_terminal(
-        self,
-        text: str,
-        text_colour: Optional[Colour] = None,
-        text_bg: Optional[Colour] = None,
-        text_end: Optional[str] = None,
-        text_delay: Optional[int] = None,
-    ) -> None:
-        def main(stdscr: Any) -> Any:
+    def text_terminal(self, text: str) -> None:
+        def main(stdscr: window) -> None:
             stdscr.erase()
             column = 0
             row = 0
 
-            text_colour_ = text_colour or self.text_colour
-            text_bg_ = text_bg or self.text_bg
-            text_end_ = text_end or self.text_end
-            text_delay_ = text_delay or self.text_delay
-
-            curses.init_pair(1, text_colour_.value, text_bg_.value)
+            curses.init_pair(1, self.text_colour.value, self.text_bg.value)
 
             for letter in text:
                 if letter == "\n":
@@ -74,10 +65,10 @@ class Console:
                 stdscr.addstr(row, column, letter, curses.color_pair(1))
                 column += 1
                 stdscr.refresh()
-                time.sleep(text_delay_)
+                time.sleep(self.text_delay)
 
-            if text_end_:
-                stdscr.addstr(f"\n\n{text_end_}")
+            if self.text_end:
+                stdscr.addstr(f"\n{self.text_end}")
             stdscr.refresh()
             stdscr.getch()
 
@@ -102,17 +93,12 @@ class Console:
         prompt: str,
         decode_input: bool = True,
     ) -> Union[str, bytes]:
-        def main(stdscr: Any) -> Any:
+        def main(stdscr: window) -> Union[str, bytes]:
             stdscr.erase()
             column = 0
             row = 0
 
-            text_colour_ = self.text_colour
-            text_bg_ = self.text_bg
-            text_delay_ = self.text_delay
-            max_input_char_ = self.max_input_char
-
-            curses.init_pair(1, text_colour_.value, text_bg_.value)
+            curses.init_pair(1, self.text_colour.value, self.text_bg.value)
 
             for letter in prompt:
                 if column == self._max_wrap(stdscr):
@@ -126,10 +112,10 @@ class Console:
                 stdscr.addstr(row, column, letter, curses.color_pair(1))
                 column += 1
                 stdscr.refresh()
-                time.sleep(text_delay_)
+                time.sleep(self.text_delay)
 
             curses.echo()
-            user_input = stdscr.getstr(row, column, max_input_char_)
+            user_input = stdscr.getstr(row, column, self.max_input_char)
             if decode_input:
                 return user_input.decode()
             return user_input
@@ -147,7 +133,7 @@ class Console:
         option_bg: Optional[Colour] = None,
         text_delay: Optional[int] = None,
     ) -> Union[int, str, tuple[int, str]]:
-        def main(stdscr: Any) -> Any:
+        def main(stdscr: window) -> Any:
             choice = 0
             option_row = 2
 
