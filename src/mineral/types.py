@@ -1,6 +1,14 @@
+from __future__ import annotations
+
 import curses
-from enum import Enum, auto
-from typing import TypeAlias
+from enum import Enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from typing import Any, Tuple, TypeAlias
+
+
+__all__ = ("Colour", "Color", "MISSING")
 
 
 class Colour(Enum):
@@ -17,6 +25,20 @@ class Colour(Enum):
 Color: TypeAlias = Colour
 
 
-class ReturnType(Enum):
-    INDEX = auto()
-    LITERAL = auto()
+class _MissingSentinel:
+    __slots__: Tuple[str, ...] = ()
+
+    def __eq__(self, other: Any) -> bool:
+        return False
+
+    def __bool__(self) -> bool:
+        return False
+
+    def __hash__(self) -> int:
+        return 0
+
+    def __repr__(self) -> str:
+        return "..."
+
+
+MISSING: Any = _MissingSentinel()
