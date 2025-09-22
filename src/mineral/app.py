@@ -1,10 +1,21 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .window_manager import WindowManager
+
 
 class App:
-    def __init__(
-        self,
-    ) -> None:
-        pass
+    def __init__(self, manager: WindowManager) -> None:
+        self.manager = manager
 
-    def run(self) -> None: ...
+    def run(self) -> None:
+        if self.manager.current_window is None:
+            raise RuntimeError("No window has been set to run.")
+        
+        while self.manager.is_running:
+            self.manager.current_window.update()
+            for state in self.manager.current_window.states:
+                state.update()
+
