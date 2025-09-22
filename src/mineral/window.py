@@ -28,10 +28,12 @@ class Window:
     def __init_subclass__(cls, *, window_name: Optional[str] = None) -> None:
         cls.window_name = window_name or cls.__name__
 
-    def add_state(self, state: State) -> None:
+    @staticmethod
+    def add_state(state: State) -> None:
         Window.states.append(state)
-    
-    def remove_state(self, state: State) -> None:
+
+    @staticmethod
+    def remove_state(state: State) -> None:
         Window.states.remove(state)
 
     def on_setup(self) -> None:
