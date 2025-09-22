@@ -19,6 +19,9 @@ _GLOBAL_ON_LEAVE_ARGS: int = 2
 _KW_CONSIDER: Tuple[str, str] = ("VAR_KEYWORD", "KEYWORD_ONLY")
 
 
+__all__ = ("WindowManager",)
+
+
 class WindowManager:
     """The Window Manager used for managing multiple Window(s).
 
