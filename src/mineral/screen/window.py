@@ -2,12 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .types import MISSING
+from ..types import MISSING
 
 if TYPE_CHECKING:
-    from typing import Any, List, Optional
+    from typing import Any, Optional
 
-    from .state import State
     from .window_manager import WindowManager
 
 
@@ -23,18 +22,12 @@ class Window:
 
     window_name: str = MISSING
     manager: WindowManager = MISSING
-    states: List[State] = []
 
     def __init_subclass__(cls, *, window_name: Optional[str] = None) -> None:
         cls.window_name = window_name or cls.__name__
-
-    @staticmethod
-    def add_state(state: State) -> None:
-        Window.states.append(state)
-
-    @staticmethod
-    def remove_state(state: State) -> None:
-        Window.states.remove(state)
+    
+    def __init__(self) -> None:
+        ...
 
     def on_setup(self) -> None:
         r"""This listener is only called once while being loaded into the ``WindowManager``.
