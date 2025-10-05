@@ -26,9 +26,11 @@ Color: TypeAlias = Colour
 
 
 class _MissingSentinel:
+    # *Borrowed* from the discord.py library.
+
     __slots__: Tuple[str, ...] = ()
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, _: Any) -> bool:
         return False
 
     def __bool__(self) -> bool:
