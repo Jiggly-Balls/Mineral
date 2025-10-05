@@ -13,18 +13,19 @@ if TYPE_CHECKING:
 
 
 class App:
-    def __init__(self, manager: WindowManager) -> None:
+    def __init__(self, manager: WindowManager, min_height: int = 20, min_width: int = 20) -> None:
         self.manager: WindowManager = manager
-        self.screen: curses.window = MISSING  # curses.initscr()
-
-        # Window.screen = self.screen
-        #
-        # if colours:
-        #     curses.start_color()
-        #     curses.use_default_colors()
-        # curses.noecho()
+        self.screen: curses.window = MISSING
+        self.min_height = min_height
+        self.min_width = min_width
 
     def pre_update(self) -> bool:
+        height, width = self.screen.getmaxyx()
+        if height < self.min_height or width < self.min_width:
+            self.screen.clear()
+            text = f"Minimum size of terminal required: {self.min_width}x{self.min_height}"
+            self.screen.addstr(height // 2, (width + len(text)) // 2, text)
+            return False
         return True
 
     def run(self, *args: Any) -> None:
