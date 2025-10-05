@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .window_manager import WindowManager
+    from .screen.window_manager import WindowManager
 
 
 class App:
@@ -16,6 +16,4 @@ class App:
         
         while self.manager.is_running:
             self.manager.current_window.update()
-            for state in self.manager.current_window.states:
-                state.update()
 
