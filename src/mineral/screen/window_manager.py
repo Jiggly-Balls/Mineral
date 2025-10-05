@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 _GLOBAL_ON_SETUP_ARGS: int = 1
 _GLOBAL_ON_ENTER_ARGS: int = 2
 _GLOBAL_ON_LEAVE_ARGS: int = 2
+_GLOBAL_ON_UPDATE_ARGS: int = 1
 _KW_CONSIDER: Tuple[str, str] = ("VAR_KEYWORD", "KEYWORD_ONLY")
 
 
@@ -33,7 +34,9 @@ class WindowManager:
             A bool for controlling the game loop. ``True`` by default.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, *windows: Type[Window]) -> None:
+        self.load_windows(*windows)
+
         Window.manager = self
 
         self.is_running: bool = True
@@ -45,6 +48,9 @@ class WindowManager:
         self._global_on_leave: Optional[
             Callable[[Optional[Window], Window], None]
         ] = None
+        self._global_on_update: Optional[Callable[[WindowManager], None]] = (
+            None
+        )
 
         self._windows: Dict[str, Window] = {}
         self._current_window: Optional[Window] = None
@@ -108,26 +114,27 @@ class WindowManager:
 
     @global_on_enter.setter
     def global_on_enter(
-        self, value: Callable[[Window, Optional[Window]], None]
+        self, value: Optional[Callable[[Window, Optional[Window]], None]]
     ) -> None:
-        on_enter_signature = inspect.signature(value)
-        pos_args = self._get_pos_args(on_enter_signature)
-        kw_args = self._get_kw_args(on_enter_signature)
+        if value is not None:
+            on_enter_signature = inspect.signature(value)
+            pos_args = self._get_pos_args(on_enter_signature)
+            kw_args = self._get_kw_args(on_enter_signature)
 
-        if (
-            len(on_enter_signature.parameters) != _GLOBAL_ON_ENTER_ARGS
-            or kw_args != 0
-        ):
-            raise TypeError(
-                f"Expected {_GLOBAL_ON_ENTER_ARGS} positional argument(s) only "
-                f"for the function to be assigned to global_on_enter. "
-                f"Instead got {pos_args} positional argument(s)"
-                + (
-                    f" and {kw_args} keyword argument(s)."
-                    if kw_args > 0
-                    else "."
+            if (
+                len(on_enter_signature.parameters) != _GLOBAL_ON_ENTER_ARGS
+                or kw_args != 0
+            ):
+                raise TypeError(
+                    f"Expected {_GLOBAL_ON_ENTER_ARGS} positional argument(s) only "
+                    f"for the function to be assigned to global_on_enter. "
+                    f"Instead got {pos_args} positional argument(s)"
+                    + (
+                        f" and {kw_args} keyword argument(s)."
+                        if kw_args > 0
+                        else "."
+                    )
                 )
-            )
 
         self._global_on_enter = value
 
@@ -159,26 +166,27 @@ class WindowManager:
 
     @global_on_leave.setter
     def global_on_leave(
-        self, value: Callable[[Optional[Window], Window], None]
+        self, value: Optional[Callable[[Optional[Window], Window], None]]
     ) -> None:
-        on_leave_signature = inspect.signature(value)
-        pos_args = self._get_pos_args(on_leave_signature)
-        kw_args = self._get_kw_args(on_leave_signature)
+        if value is not None:
+            on_leave_signature = inspect.signature(value)
+            pos_args = self._get_pos_args(on_leave_signature)
+            kw_args = self._get_kw_args(on_leave_signature)
 
-        if (
-            len(on_leave_signature.parameters) != _GLOBAL_ON_LEAVE_ARGS
-            or kw_args != 0
-        ):
-            raise TypeError(
-                f"Expected {_GLOBAL_ON_LEAVE_ARGS} positional argument(s) only "
-                f"for the function to be assigned to global_on_leave. "
-                f"Instead got {pos_args} positional argument(s)"
-                + (
-                    f" and {kw_args} keyword argument(s)."
-                    if kw_args > 0
-                    else "."
+            if (
+                len(on_leave_signature.parameters) != _GLOBAL_ON_LEAVE_ARGS
+                or kw_args != 0
+            ):
+                raise TypeError(
+                    f"Expected {_GLOBAL_ON_LEAVE_ARGS} positional argument(s) only "
+                    f"for the function to be assigned to global_on_leave. "
+                    f"Instead got {pos_args} positional argument(s)"
+                    + (
+                        f" and {kw_args} keyword argument(s)."
+                        if kw_args > 0
+                        else "."
+                    )
                 )
-            )
 
         self._global_on_leave = value
 
@@ -202,27 +210,82 @@ class WindowManager:
         return self._global_on_setup
 
     @global_on_setup.setter
-    def global_on_setup(self, value: Callable[[Window], None]) -> None:
-        on_setup_signature = inspect.signature(value)
-        pos_args = self._get_pos_args(on_setup_signature)
-        kw_args = self._get_kw_args(on_setup_signature)
+    def global_on_setup(
+        self, value: Optional[Callable[[Window], None]]
+    ) -> None:
+        if value is not None:
+            on_setup_signature = inspect.signature(value)
+            pos_args = self._get_pos_args(on_setup_signature)
+            kw_args = self._get_kw_args(on_setup_signature)
 
-        if (
-            len(on_setup_signature.parameters) != _GLOBAL_ON_SETUP_ARGS
-            or kw_args != 0
-        ):
-            raise TypeError(
-                f"Expected {_GLOBAL_ON_SETUP_ARGS} positional argument(s) only "
-                f"for the function to be assigned to global_on_setup. "
-                f"Instead got {pos_args} positional argument(s)"
-                + (
-                    f" and {kw_args} keyword argument(s)."
-                    if kw_args > 0
-                    else "."
+            if (
+                len(on_setup_signature.parameters) != _GLOBAL_ON_SETUP_ARGS
+                or kw_args != 0
+            ):
+                raise TypeError(
+                    f"Expected {_GLOBAL_ON_SETUP_ARGS} positional argument(s) only "
+                    f"for the function to be assigned to global_on_setup. "
+                    f"Instead got {pos_args} positional argument(s)"
+                    + (
+                        f" and {kw_args} keyword argument(s)."
+                        if kw_args > 0
+                        else "."
+                    )
                 )
-            )
 
         self._global_on_setup = value
+
+    @property
+    def global_on_update(
+        self,
+    ) -> Optional[Callable[[WindowManager], None]]:
+        """The global on_enter listener called right before a window's on_enter listener.
+
+        .. note::
+            This has to be assigned before changing the windows.
+
+        The first argument passed to the function is the current window and the second
+        is the previous window which may be ``None``.
+
+        Example for a ``global_on_enter`` function-
+
+        .. code-block:: python
+
+            def global_on_enter(
+                current_window: Window, previous_window: None | Window
+            ) -> None:
+                if previous_window:
+                    print(
+                        f"GLOBAL ENTER - Entering {current_window.window_name} from {previous_window.window_name}"
+                    )
+        """
+        return self._global_on_update
+
+    @global_on_update.setter
+    def global_on_update(
+        self, value: Optional[Callable[[WindowManager], None]]
+    ) -> None:
+        if value is not None:
+            on_enter_signature = inspect.signature(value)
+            pos_args = self._get_pos_args(on_enter_signature)
+            kw_args = self._get_kw_args(on_enter_signature)
+
+            if (
+                len(on_enter_signature.parameters) != _GLOBAL_ON_UPDATE_ARGS
+                or kw_args != 0
+            ):
+                raise TypeError(
+                    f"Expected {_GLOBAL_ON_ENTER_ARGS} positional argument(s) only "
+                    f"for the function to be assigned to global_on_update. "
+                    f"Instead got {pos_args} positional argument(s)"
+                    + (
+                        f" and {kw_args} keyword argument(s)."
+                        if kw_args > 0
+                        else "."
+                    )
+                )
+
+        self._global_on_update = value
 
     @property
     def last_window(self) -> Optional[Window]:
