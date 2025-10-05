@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from ..types import MISSING
 
 if TYPE_CHECKING:
+    import curses
     from typing import Any, Optional
 
     from .window_manager import WindowManager
@@ -22,12 +23,10 @@ class Window:
 
     window_name: str = MISSING
     manager: WindowManager = MISSING
+    screen: curses.window = MISSING
 
     def __init_subclass__(cls, *, window_name: Optional[str] = None) -> None:
         cls.window_name = window_name or cls.__name__
-    
-    def __init__(self) -> None:
-        ...
 
     def on_setup(self) -> None:
         r"""This listener is only called once while being loaded into the ``WindowManager``.
@@ -54,7 +53,7 @@ class Window:
         """
         pass
 
-    def update(self, *args: Any) -> None:
+    def on_update(self, *args: Any) -> None:
         r"""The update process of the window. The main logic of the app must reside in the
         State instead of the Window.
 
