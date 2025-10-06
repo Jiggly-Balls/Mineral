@@ -4,6 +4,7 @@ import curses
 from typing import TYPE_CHECKING
 
 from .screen.window import Window
+from .types import MISSING
 from .utils import FileLogger
 
 if TYPE_CHECKING:
@@ -13,16 +14,11 @@ if TYPE_CHECKING:
 
 
 class App:
-    def __init__(self, manager: WindowManager, min_height: int = 20, min_width: int = 20) -> None:
+    def __init__(
+        self, manager: WindowManager, min_height: int = 20, min_width: int = 20
+    ) -> None:
         self.manager: WindowManager = manager
-        self.screen: curses.window = curses.initscr()
-        Window.screen = self.screen
-
-        curses.cbreak()
-        curses.noecho()
-        self.screen.keypad(True)
-        curses.start_color()
-        curses.use_default_colors()
+        self.screen: curses.window = MISSING
 
         self.min_height = min_height
         self.min_width = min_width
@@ -35,7 +31,7 @@ class App:
         if key == curses.KEY_RESIZE:
             curses.resize_term(0, 0)
             self.screen.clear()
-        
+
         height, width = self.screen.getmaxyx()
         # self.logger.file_log(f"{height=} {width=}")
 
@@ -59,21 +55,26 @@ class App:
         return True
 
     def run(self, *args: Any) -> None:
-        if self.manager.current_window is None:
-            raise RuntimeError("No window has been set to run.")
+        def run_wrapper(stdscr: curses.window) -> None:
+            if self.manager.current_window is None:
+                raise RuntimeError("No window has been set to run.")
 
-        while self.manager.is_running:
-            self.screen.nodelay(True)
-            continue_update = self.pre_update()
-            self.screen.nodelay(False)
+            self.screen = stdscr
+            Window.screen = stdscr
 
-            if continue_update:
-                if self.manager.global_on_update:
-                    self.manager.global_on_update(self.manager)
-                try:
-                    self.screen.refresh()
-                except curses.error:
-                    pass
+            while self.manager.is_running:
+                self.screen.nodelay(True)
+                continue_update = self.pre_update()
+                self.screen.nodelay(False)
 
-                self.manager.current_window.on_update(*args)
+                if continue_update:
+                    if self.manager.global_on_update:
+                        self.manager.global_on_update(self.manager)
+                    try:
+                        self.screen.refresh()
+                    except curses.error:
+                        pass
 
+                    self.manager.current_window.on_update(*args)
+
+        curses.wrapper(run_wrapper)
