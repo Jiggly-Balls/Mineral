@@ -22,10 +22,13 @@ class App:
 
         self.min_height: int = min_height
         self.min_width: int = min_width
+        self.error_text: str = "Minimum terminal size required: {}x{}"
+        # First placeholder for min_width
+        # Second placeholder for min_height
 
         self.logger: FileLogger = FileLogger("curse_of_terminal.log")
 
-    def pre_update(self) -> bool:
+    def _pre_update(self) -> bool:
         key = self.screen.getch()
 
         if key == curses.KEY_RESIZE:
@@ -37,10 +40,10 @@ class App:
 
         if height < self.min_height or width < self.min_width:
             self.screen.clear()
-            text = f"Minimum terminal size required: {self.min_width}x{self.min_height}"
+            text = self.error_text.format(self.min_width, self.min_height)
 
             x = (width - len(text)) // 2 if width > len(text) else 0
-            y = height // 2 if height > 0 else 0
+            y = height // 2
             try:
                 self.screen.addstr(y, x, text)
             except curses.error:
@@ -64,7 +67,7 @@ class App:
 
             while self.manager.is_running:
                 self.screen.nodelay(True)
-                continue_update = self.pre_update()
+                continue_update = self._pre_update()
                 self.screen.nodelay(False)
 
                 if continue_update:
