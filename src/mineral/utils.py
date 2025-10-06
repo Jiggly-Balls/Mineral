@@ -1,6 +1,6 @@
 class FileLogger:
     def __init__(self, path: str) -> None:
-        self.path = path
+        self.path: str = path
         with open(path, "w"):
             ...
 

@@ -20,10 +20,10 @@ class App:
         self.manager: WindowManager = manager
         self.screen: curses.window = MISSING
 
-        self.min_height = min_height
-        self.min_width = min_width
+        self.min_height: int = min_height
+        self.min_width: int = min_width
 
-        self.logger = FileLogger("curse_of_terminal.log")
+        self.logger: FileLogger = FileLogger("curse_of_terminal.log")
 
     def pre_update(self) -> bool:
         key = self.screen.getch()
