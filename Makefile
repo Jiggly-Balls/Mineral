@@ -6,4 +6,3 @@ ruff:
 
 check:
 	uv tool run basedpyright .
-	
