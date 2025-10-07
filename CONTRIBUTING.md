@@ -6,24 +6,29 @@ Thank you for your interest in contributing to **Mineral**! Contributions—whet
 
 ## 🛠️ Getting Started
 
-1. **Fork** the repository and clone your fork.
+1. Fork the repository and clone your fork.
 2. Create a new branch:
+
    ```
    git checkout -b branch-name
    ```
 
    Your `branch-name` should prefix one of the following-
-   - `features/<name>`
-        - For additional Features
 
-   - `bugfix/<name>`
-        - Fixing bugs
+   - `feature/<branch-name>`
 
-   - `enhancement/<name>`
-        - For improving or refactoring existing code
+     - For additional features.
 
-   - `other/<name>`
-        - For changes that don’t fit the above categories. 
+   - `bugfix/<branch-name>`
+
+     - For bug fixes.
+
+   - `enhancement/<branch-name>`
+
+     - For improving or refactoring existing code.
+
+   - `other/<branch-name>`
+     - For changes that don’t fit the above categories.
 
 3. Install dependencies (recommended to use uv):
    ```
@@ -41,6 +46,7 @@ Thank you for your interest in contributing to **Mineral**! Contributions—whet
 - Use docstrings in [Numpydoc](https://numpydoc.readthedocs.io/en/latest/format.html) style.
 - Use `basedpyright` for type checking.
 - Use `ruff` for linting and formatting.
+- If you have `Make` on your system you can run `make` to autoformat and `make check` to type check (both through `uv`).
 
 ### Commit Messages
 
