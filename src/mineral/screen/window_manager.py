@@ -35,8 +35,6 @@ class WindowManager:
     """
 
     def __init__(self, *windows: Type[Window]) -> None:
-        self.load_windows(*windows)
-
         Window.manager = self
 
         self.is_running: bool = True
@@ -55,6 +53,8 @@ class WindowManager:
         self._windows: Dict[str, Window] = {}
         self._current_window: Optional[Window] = None
         self._last_window: Optional[Window] = None
+
+        self.load_windows(*windows)
 
     def _get_kw_args(self, signature: Signature) -> int:
         amount = 0
