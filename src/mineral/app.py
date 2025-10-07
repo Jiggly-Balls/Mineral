@@ -27,18 +27,22 @@ class App:
         # Second placeholder for min_height
 
         self.logger: FileLogger = FileLogger("curse_of_terminal.log")
-
-    def _pre_update(self) -> bool:
+    
+    def _resize_handle(self) -> None:
+        self.screen.nodelay(True)
         key = self.screen.getch()
 
         if key == curses.KEY_RESIZE:
             curses.resize_term(0, 0)
             self.screen.clear()
 
+        self.screen.nodelay(False)
+
+    def _pre_update(self) -> bool:
         height, width = self.screen.getmaxyx()
         # self.logger.file_log(f"{height=} {width=}")
 
-        if height < self.min_height or width < self.min_width:
+        if height < self.min_height or width < self.min_width and height >= 1 and width >= len(self.error_text):
             self.screen.clear()
             text = self.error_text.format(self.min_width, self.min_height)
 
@@ -66,9 +70,9 @@ class App:
             Window.screen = stdscr
 
             while self.manager.is_running:
-                self.screen.nodelay(True)
+                self._resize_handle()
+
                 continue_update = self._pre_update()
-                self.screen.nodelay(False)
 
                 if continue_update:
                     if self.manager.global_on_update:
@@ -79,5 +83,7 @@ class App:
                         pass
 
                     self.manager.current_window.on_update(*args)
+
+                self._resize_handle()
 
         curses.wrapper(run_wrapper)
