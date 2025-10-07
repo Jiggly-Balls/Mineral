@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+import curses
 from typing import TYPE_CHECKING
 
 from ..types import MISSING
 
 if TYPE_CHECKING:
-    import curses
     from typing import Any, Optional
 
     from .window_manager import WindowManager
@@ -27,6 +27,10 @@ class Window:
 
     def __init_subclass__(cls, *, window_name: Optional[str] = None) -> None:
         cls.window_name = window_name or cls.__name__
+
+    def curses_quit(self) -> None:
+        self.manager.is_running = False
+        curses.endwin()
 
     def on_setup(self) -> None:
         r"""This listener is only called once while being loaded into the ``WindowManager``.
