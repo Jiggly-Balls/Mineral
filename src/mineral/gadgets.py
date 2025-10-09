@@ -57,7 +57,7 @@ class Text:
         self.running: bool = False
         self.finished: bool = False
 
-        if auto_start:
+        if auto_start and not self.finished:
             self.start()
     
     def _calculate_rel_pos(self) -> None:
@@ -75,8 +75,25 @@ class Text:
                 self._calculate_rel_pos()
                 column, row = self.pos
 
-        else:
-            self._calculate_rel_pos()
-            column, row = self.pos
+                if char == "\n":
+                    row += 1
+                    column = 0
+                    continue
+                self.win.addstr(row, column, char)
+                column += 1
+                self.win.refresh()
 
-            self.win.addstr(row, column, self.text)
+        else:
+            self.final_draw()
+        
+        self.running = False
+        self.finished = True
+    
+    def final_draw(self) -> None:
+        self.running = True
+
+        self._calculate_rel_pos()
+        column, row = self.pos
+        self.win.addstr(row, column, self.text)
+
+        self.running = False
